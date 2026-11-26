@@ -54,7 +54,7 @@ export async function maybeSync(db: DB, force = false) {
   const { data: st } = await db.from("sync_state").select("requests_today,requests_day").eq("key", "main").single();
   const reqs = (st?.requests_day === today ? st.requests_today : 0) + 1;
   await db.from("sync_state").update({
-    last_ok: errors.length ? undefined : new Date().toISOString(),
+    ...(errors.length ? {} : { last_ok: new Date().toISOString() }),
     last_error: errors.length ? errors.join(" | ") : null,
     requests_today: reqs, requests_day: today,
   }).eq("key", "main");
